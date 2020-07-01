@@ -1,0 +1,15 @@
+{
+  "name": "cq-node-assignment",
+  "version": "1.0.0",
+  "description": "The Cirqle NodeJS assignment",
+  "main": "app.js",
+  "scripts": {
+    "start": "nodemon src/app.js"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.17.1",
+    "nodemon": "^2.0.4"
+  }
+}
