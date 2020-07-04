@@ -9,7 +9,7 @@ Also, the total audience reported is the addition of all the individual audience
 
 `npm run test`
 
-Test results can be found in `coverage/lcov-report/index.html`
+The test report can be found in `coverage/lcov-report/index.html`
 
 ## Setup
 
@@ -25,9 +25,12 @@ npm start
 
 - More tests
 - Quering the interest's status everytime it's a waste of resources since those won't change often. I would start by adding a service to keep an updated cache.
+- Dockerize
 - What's up with that coverage? MORE TESTS!
 
-# Setup
+## Original Assignment README
+
+### Setup
 
 ```
 
@@ -36,7 +39,7 @@ npm start
 
 ```
 
-# Assignment
+### Assignment
 
 Create 2 endpoints to get Facebook ad interests information.
 
