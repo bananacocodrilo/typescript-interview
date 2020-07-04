@@ -4,32 +4,57 @@ import * as curl from "curl";
 export class FacebookMarketingClient {
   private accessToken: string = process.env.FACEBOOK_TOKEN;
   private facebookApiUrl: string = process.env.FACEBOOK_URL;
-  private interestsParams: string =
-    "?type=adTargetingCategory&class=interests&access_token=";
 
   async getInterests() {
     return new Promise((accept, reject) => {
-      curl.get(
-        `${this.facebookApiUrl}${this.interestsParams}${this.accessToken}`,
-        "",
-        (err: any, response: any, data: string) => {
-          let interests: { data: InterestData };
-          if (err) {
-            reject(err);
-          }
+      const query = `${this.facebookApiUrl}?type=adTargetingCategory&class=interests&access_token=${this.accessToken}`;
 
-          interests = JSON.parse(data);
-          accept(interests.data);
+      curl.get(query, "", (err: any, response: any, data: string) => {
+        let interests: { data?: InterestData[]; error?: any };
+
+        if (err) {
+          reject(err);
         }
-      );
+
+        interests = JSON.parse(data);
+        if (interests.error) {
+          reject(interests.error);
+        }
+
+        accept(interests.data);
+      });
     });
   }
 
-  test() {
-    return this.accessToken;
+  async filterInterestsByStatus(interestsList: string, desiredStatus: string) {
+    return new Promise((accept, reject) => {
+      const query = `${this.facebookApiUrl}?type=targetingoptionstatus&targeting_option_list=[${interestsList}]&access_token=${this.accessToken}`;
+      const interestsWithStatus: string[] = [];
+
+      curl.get(query, "", (err: any, response: any, data: string) => {
+        let parsedData: { error?: string; data: InterestStatus[] };
+
+        if (err) {
+          reject(err);
+        }
+
+        parsedData = JSON.parse(data);
+
+        if (parsedData.error) {
+          reject(parsedData.error);
+        }
+
+        parsedData.data.forEach((interest: InterestStatus) => {
+          if (interest.current_status === desiredStatus) {
+            interestsWithStatus.push(interest.id);
+          }
+        });
+
+        accept(interestsWithStatus);
+      });
+    });
   }
 }
-
 export const register = (app: express.Application) => {
   const facebook = new FacebookMarketingClient();
 
