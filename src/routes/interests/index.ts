@@ -94,8 +94,49 @@ export const register = (app: express.Application) => {
       });
   });
 
-  app.get(`/interests/audience-size`, (req: any, res) => {
-    console.log(`/interests/audience-size ${req.query.ids}`);
-    res.sendStatus(200);
+  app.get(`/interests/audience-size`, async (req: any, res) => {
+    const result: AudienceSize = { totalAudienceSize: 0 };
+    let idsList: string[] = [];
+
+    try {
+      idsList = req.query.ids.split(",");
+    } catch (e) {
+      console.warn(e);
+    }
+
+    if (!idsList || !idsList.length || !idsList[0].length) {
+      res.status(400);
+      res.send(
+        "Invalid request. `ids` parameter must provide a list of ids separated by ','."
+      );
+      return;
+    }
+
+    await facebookClient
+      .filterInterestsByStatus(idsList.toString(), `NORMAL`)
+      .then((filteredIds: string[]) => {
+        idsList = [...filteredIds];
+      })
+      .catch((err) => {
+        res.sendStatus(500);
+        throw err;
+      });
+
+    await facebookClient
+      .getInterests()
+      .then((data: InterestData[]) => {
+        data.forEach((interest) => {
+          if (idsList.includes(interest.id)) {
+            result.totalAudienceSize += interest.audience_size;
+          }
+        });
+
+        res.status(200);
+        res.send(result);
+      })
+      .catch((err) => {
+        res.sendStatus(500);
+        throw err;
+      });
   });
 };
