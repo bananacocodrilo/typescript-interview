@@ -85,7 +85,6 @@ export const register = (app: express.Application) => {
           }
         });
 
-        console.log(result.length);
         res.status(200);
         res.send(result);
       })
