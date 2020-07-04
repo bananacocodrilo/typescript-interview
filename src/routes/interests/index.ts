@@ -59,13 +59,35 @@ export const register = (app: express.Application) => {
   const facebook = new FacebookMarketingClient();
 
   app.get(`/interests`, async (req: any, res) => {
-    console.log(`/interests`);
+    const idsList: string[] = [];
+    const result: InterestData[] = [];
+    let allInterests: InterestData[];
 
     await facebook
       .getInterests()
-      .then((data: InterestData) => {
-        console.log(data);
-        res.sendStatus(200);
+      .then((data: InterestData[]) => {
+        allInterests = [...data];
+        data.forEach((interest: InterestData) => {
+          idsList.push(interest.id);
+        });
+      })
+      .catch((err) => {
+        res.sendStatus(500);
+        throw err;
+      });
+
+    await facebook
+      .filterInterestsByStatus(idsList.toString(), `NORMAL`)
+      .then((filteredIds: string[]) => {
+        allInterests.forEach((interest: InterestData) => {
+          if (filteredIds.includes(interest.id)) {
+            result.push(interest);
+          }
+        });
+
+        console.log(result.length);
+        res.status(200);
+        res.send(result);
       })
       .catch((err) => {
         res.sendStatus(500);
