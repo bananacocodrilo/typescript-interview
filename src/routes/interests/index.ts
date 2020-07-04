@@ -1,60 +1,6 @@
 import * as express from "express";
-import * as curl from "curl";
+import { FacebookMarketingClient } from "../../classes/facebookMarketingClient";
 
-export class FacebookMarketingClient {
-  private accessToken: string = process.env.FACEBOOK_TOKEN;
-  private facebookApiUrl: string = process.env.FACEBOOK_URL;
-
-  async getInterests() {
-    return new Promise((accept, reject) => {
-      const query = `${this.facebookApiUrl}?type=adTargetingCategory&class=interests&access_token=${this.accessToken}`;
-
-      curl.get(query, "", (err: any, response: any, data: string) => {
-        let interests: { data?: InterestData[]; error?: any };
-
-        if (err) {
-          reject(err);
-        }
-
-        interests = JSON.parse(data);
-        if (interests.error) {
-          reject(interests.error);
-        }
-
-        accept(interests.data);
-      });
-    });
-  }
-
-  async filterInterestsByStatus(interestsList: string, desiredStatus: string) {
-    return new Promise((accept, reject) => {
-      const query = `${this.facebookApiUrl}?type=targetingoptionstatus&targeting_option_list=[${interestsList}]&access_token=${this.accessToken}`;
-      const interestsWithStatus: string[] = [];
-
-      curl.get(query, "", (err: any, response: any, data: string) => {
-        let parsedData: { error?: string; data: InterestStatus[] };
-
-        if (err) {
-          reject(err);
-        }
-
-        parsedData = JSON.parse(data);
-
-        if (parsedData.error) {
-          reject(parsedData.error);
-        }
-
-        parsedData.data.forEach((interest: InterestStatus) => {
-          if (interest.current_status === desiredStatus) {
-            interestsWithStatus.push(interest.id);
-          }
-        });
-
-        accept(interestsWithStatus);
-      });
-    });
-  }
-}
 export const register = (app: express.Application) => {
   const facebookClient = new FacebookMarketingClient();
 
@@ -77,7 +23,7 @@ export const register = (app: express.Application) => {
       });
 
     await facebookClient
-      .filterInterestsByStatus(idsList.toString(), `NORMAL`)
+      .filterInterestsByStatus(idsList, `NORMAL`)
       .then((filteredIds: string[]) => {
         allInterests.forEach((interest: InterestData) => {
           if (filteredIds.includes(interest.id)) {
@@ -101,7 +47,7 @@ export const register = (app: express.Application) => {
     try {
       idsList = req.query.ids.split(",");
     } catch (e) {
-      console.warn(e);
+      console.warn(`[${Date.now()}] Received invalid request `);
     }
 
     if (!idsList || !idsList.length || !idsList[0].length) {
@@ -113,7 +59,7 @@ export const register = (app: express.Application) => {
     }
 
     await facebookClient
-      .filterInterestsByStatus(idsList.toString(), `NORMAL`)
+      .filterInterestsByStatus(idsList, `NORMAL`)
       .then((filteredIds: string[]) => {
         idsList = [...filteredIds];
       })
