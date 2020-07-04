@@ -60,7 +60,7 @@ export const register = (app: express.Application) => {
 
   app.get(`/interests`, async (req: any, res) => {
     const idsList: string[] = [];
-    const result: InterestData[] = [];
+    const result: InterestListEntry[] = [];
     let allInterests: InterestData[];
 
     await facebookClient
@@ -81,7 +81,7 @@ export const register = (app: express.Application) => {
       .then((filteredIds: string[]) => {
         allInterests.forEach((interest: InterestData) => {
           if (filteredIds.includes(interest.id)) {
-            result.push(interest);
+            result.push({ id: interest.id, name: interest.name });
           }
         });
 
