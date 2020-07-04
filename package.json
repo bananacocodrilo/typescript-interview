@@ -10,6 +10,7 @@
     "build": "npm-run-all clean lint tsc ",
     "lint": "tslint -c tslint.json -p tsconfig.json --fix",
     "tsc": "tsc",
+    "dev:start": "npm-run-all build start",
     "dev": "nodemon --watch src -e ts,ejs --exec npm run dev:start",
     "start": "node ."
   },
