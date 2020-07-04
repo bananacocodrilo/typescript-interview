@@ -9,22 +9,19 @@ export const register = (app: express.Application) => {
     const result: InterestListEntry[] = [];
     let allInterests: InterestData[];
 
+    // First get all the interests
     await facebookClient
       .getInterests()
       .then((data: InterestData[]) => {
+        // Make a copy and a list of ids
         allInterests = [...data];
         data.forEach((interest: InterestData) => {
           idsList.push(interest.id);
         });
       })
-      .catch((err) => {
-        res.sendStatus(500);
-        throw err;
-      });
-
-    await facebookClient
-      .filterInterestsByStatus(idsList, `NORMAL`)
+      .then(() => facebookClient.filterInterestsByStatus(idsList, `NORMAL`)) // Filter the list of ids by status=NORMAL
       .then((filteredIds: string[]) => {
+        // Create the list of interests in NORMAL status with the expected result format
         allInterests.forEach((interest: InterestData) => {
           if (filteredIds.includes(interest.id)) {
             result.push({ id: interest.id, name: interest.name });
@@ -36,7 +33,7 @@ export const register = (app: express.Application) => {
       })
       .catch((err) => {
         res.sendStatus(500);
-        throw err;
+        return;
       });
   });
 
@@ -44,6 +41,7 @@ export const register = (app: express.Application) => {
     const result: AudienceSize = { totalAudienceSize: 0 };
     let idsList: string[] = [];
 
+    // Parameter validation
     try {
       idsList = req.query.ids.split(",");
     } catch (e) {
@@ -59,19 +57,15 @@ export const register = (app: express.Application) => {
     }
 
     await facebookClient
+      // This time we filter the ids first since we already have a list of ids
       .filterInterestsByStatus(idsList, `NORMAL`)
       .then((filteredIds: string[]) => {
         idsList = [...filteredIds];
       })
-      .catch((err) => {
-        res.sendStatus(500);
-        throw err;
-      });
-
-    await facebookClient
-      .getInterests()
+      .then(() => facebookClient.getInterests()) // Get all the interests
       .then((data: InterestData[]) => {
         data.forEach((interest) => {
+          // finally add all the audiences in the filtered list
           if (idsList.includes(interest.id)) {
             result.totalAudienceSize += interest.audience_size;
           }
@@ -82,7 +76,7 @@ export const register = (app: express.Application) => {
       })
       .catch((err) => {
         res.sendStatus(500);
-        throw err;
+        return;
       });
   });
 };
