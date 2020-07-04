@@ -1,6 +1,20 @@
+import dotenv from "dotenv";
 import express from "express";
 
-const port = 3000;
+// Load .env file
+dotenv.config();
+// Basic env check
+if (
+  !process.env.FACEBOOK_TOKEN ||
+  !process.env.FACEBOOK_URL ||
+  !process.env.SERVER_PORT
+) {
+  throw new Error(
+    `Missing config parameter. Verify the required env vars with the .env.sample file`
+  );
+}
+
+const port = process.env.SERVER_PORT;
 const app = express();
 
 app.use(express.json());
