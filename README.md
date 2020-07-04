@@ -24,8 +24,9 @@ npm start
 ## Next steps
 
 - More tests
-- Quering the interest's status everytime it's a waste of resources since those won't change often. I would start by adding a service to keep an updated cache.
-- Dockerize
+- Cache the interests' status instead of querying it everytime.
+- Check why `/interests` is so slow (~600ms).
+- Dockerize.
 - What's up with that coverage? MORE TESTS!
 
 ## Original Assignment README
