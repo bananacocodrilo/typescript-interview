@@ -16,11 +16,13 @@ export class FacebookMarketingClient {
 
         if (err) {
           reject(err);
+          return;
         }
 
         interests = JSON.parse(data);
         if (interests.error) {
           reject(interests.error);
+          return;
         }
 
         accept(interests.data);
@@ -50,12 +52,14 @@ export class FacebookMarketingClient {
 
         if (err) {
           reject(err);
+          return;
         }
 
         parsedData = JSON.parse(data);
 
         if (parsedData.error) {
           reject(parsedData.error);
+          return;
         }
 
         parsedData.data.forEach((interest: InterestStatus) => {
