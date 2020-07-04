@@ -15,6 +15,7 @@
     "start": "node ."
   },
   "dependencies": {
+    "curl": "^0.1.4",
     "dotenv": "^8.2.0",
     "express": "^4.17.1"
   },
