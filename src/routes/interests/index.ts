@@ -56,14 +56,14 @@ export class FacebookMarketingClient {
   }
 }
 export const register = (app: express.Application) => {
-  const facebook = new FacebookMarketingClient();
+  const facebookClient = new FacebookMarketingClient();
 
   app.get(`/interests`, async (req: any, res) => {
     const idsList: string[] = [];
     const result: InterestData[] = [];
     let allInterests: InterestData[];
 
-    await facebook
+    await facebookClient
       .getInterests()
       .then((data: InterestData[]) => {
         allInterests = [...data];
@@ -76,7 +76,7 @@ export const register = (app: express.Application) => {
         throw err;
       });
 
-    await facebook
+    await facebookClient
       .filterInterestsByStatus(idsList.toString(), `NORMAL`)
       .then((filteredIds: string[]) => {
         allInterests.forEach((interest: InterestData) => {
