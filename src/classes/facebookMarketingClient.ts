@@ -40,10 +40,11 @@ export class FacebookMarketingClient {
     desiredStatus: string
   ) {
     return new Promise((accept, reject) => {
-      const query = `
-      ${this.facebookApiUrl}
-      ?type=targetingoptionstatus&targeting_option_list=[${interestsList.toString()}]&access_token=
-      ${this.accessToken}`;
+      const query = `${
+        this.facebookApiUrl
+      }?type=targetingoptionstatus&targeting_option_list=[${interestsList.toString()}]&access_token=${
+        this.accessToken
+      }`;
 
       const idsWithStatus: string[] = [];
 
