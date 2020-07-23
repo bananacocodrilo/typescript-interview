@@ -1,4 +1,4 @@
-# Solution to cq assignment
+# Solution to cq typescript assignment
 
 This is my solution to the assignment provided.
 
